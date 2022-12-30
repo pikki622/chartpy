@@ -37,8 +37,6 @@ class Chart(object):
         if chart_type is not None: self.chart_type = chart_type
         if style is not None: self.style = style
 
-        pass
-
     ##### implemented chart types:
     ##### heatmap (Plotly)
     ##### line (Bokeh, Matplotlib, Plotly, vispy)
@@ -66,20 +64,16 @@ class Chart(object):
                 pass
 
         if isinstance(df, list):
-            for i in range(0, len(df)):
+            for i in range(len(df)):
                 if isinstance(df[i], pandas.Series):
                     df[i] = pandas.DataFrame(df[i])
-        else:
-            if isinstance(df, pandas.Series):
-                df = pandas.DataFrame(df)
+        elif isinstance(df, pandas.Series):
+            df = pandas.DataFrame(df)
 
-        if engine is None:
+        if engine is not None and isinstance(engine, str) or engine is None:
             fig = self.get_engine(engine).plot_chart(df, style, chart_type)
         else:
-            if isinstance(engine, str):
-                fig = self.get_engine(engine).plot_chart(df, style, chart_type)
-            else:
-                fig = self.engine.plot_chart(df, style, chart_type)
+            fig = self.engine.plot_chart(df, style, chart_type)
 
         if twitter_on:
             twitter = Twitter()

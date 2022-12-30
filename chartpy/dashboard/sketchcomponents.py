@@ -103,13 +103,19 @@ class SketchComponents(object):
             if img_full_path is None:
                 img_full_path = self._app.get_asset_url(img)
 
-            div_list.append(html.Img(src=img_full_path,
-                                     style={'height': str(logo_height) + 'px',
-                                            'width': str(logo_width) + 'px',
-                                            'float': 'right'}))
+            div_list.append(
+                html.Img(
+                    src=img_full_path,
+                    style={
+                        'height': f'{str(logo_height)}px',
+                        'width': f'{str(logo_width)}px',
+                        'float': 'right',
+                    },
+                )
+            )
 
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
+            prefix_id = f'{prefix_id}-'
 
         if description is not None and id is not None:
             if not (isinstance(description, list)):
@@ -118,17 +124,28 @@ class SketchComponents(object):
             if isinstance(id, str):
                 id = [id]
 
-            for id_, d in zip(id, description):
-                div_list.append(html.Div(html.P(d, id=prefix_id + id_),
-                                         style={'height': '20px',
-                                                'width': '900px',
-                                                'float': 'left',
-                                                'font-family': font_family}))
-
-        return html.Div(div_list,
-                        style={'width': str(width) + 'px', 'marginBottom': 0,
-                               'marginTop': 5, 'marginLeft': 5,
-                               'marginRight': 5})
+            div_list.extend(
+                html.Div(
+                    html.P(d, id=prefix_id + id_),
+                    style={
+                        'height': '20px',
+                        'width': '900px',
+                        'float': 'left',
+                        'font-family': font_family,
+                    },
+                )
+                for id_, d in zip(id, description)
+            )
+        return html.Div(
+            div_list,
+            style={
+                'width': f'{str(width)}px',
+                'marginBottom': 0,
+                'marginTop': 5,
+                'marginLeft': 5,
+                'marginRight': 5,
+            },
+        )
 
     def button(self, caption=None, id=None, prefix_id='', className=None,
                upload=False, button_width=None, width=None):
@@ -159,7 +176,7 @@ class SketchComponents(object):
         if button_width is None: button_width = self._button_width
 
         if prefix_id != '':
-            id = prefix_id + '-' + id
+            id = f'{prefix_id}-{id}'
 
         if className is None:
             button = html.Button(caption, id=id, n_clicks=0)
@@ -167,12 +184,17 @@ class SketchComponents(object):
             if upload:
                 button = dcc.Upload(button)
 
-            return html.Div([
-                button
-            ], style={'width': str(button_width) + 'px',
-                      'display': 'inline-block', 'marginBottom': 0,
-                      'marginTop': 0, 'marginLeft': 5,
-                      'marginRight': 5})
+            return html.Div(
+                [button],
+                style={
+                    'width': f'{str(button_width)}px',
+                    'display': 'inline-block',
+                    'marginBottom': 0,
+                    'marginTop': 0,
+                    'marginLeft': 5,
+                    'marginRight': 5,
+                },
+            )
 
         else:
             button = html.Button(caption, id=id, n_clicks=0,
@@ -181,11 +203,17 @@ class SketchComponents(object):
             if upload:
                 button = dcc.Upload(button)
 
-            return html.Div([
-                button, " "
-            ], style={'width': str(width) + 'px', 'display': 'inline-block',
-                      'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
-                      'marginRight': 5})
+            return html.Div(
+                [button, " "],
+                style={
+                    'width': f'{str(width)}px',
+                    'display': 'inline-block',
+                    'marginBottom': 0,
+                    'marginTop': 0,
+                    'marginLeft': 5,
+                    'marginRight': 5,
+                },
+            )
 
     def uploadbox(self, caption=None, id=None, prefix_id='', className=None,
                   width=None):
@@ -216,30 +244,48 @@ class SketchComponents(object):
         if width is None: width = self._uploadbox_width
 
         if prefix_id != '':
-            id = prefix_id + '-' + id
+            id = f'{prefix_id}-{id}'
 
-        area = dcc.Upload(id=id, children=html.Div(
-            [caption + ': Drag and Drop or ', html.A('Select Files')],
-            style={'borderWidth': '1px', 'width': '980px',
-                   'borderStyle': 'dashed', 'borderRadius': '5px'}))
+        area = dcc.Upload(
+            id=id,
+            children=html.Div(
+                [f'{caption}: Drag and Drop or ', html.A('Select Files')],
+                style={
+                    'borderWidth': '1px',
+                    'width': '980px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                },
+            ),
+        )
 
         if className is None:
+            return html.Div(
+                [area],
+                style={
+                    'width': f'{str(width)}px',
+                    'display': 'inline-block',
+                    'marginBottom': 0,
+                    'marginTop': 0,
+                    'marginLeft': 5,
+                    'marginRight': 5,
+                },
+            )
 
-            return html.Div([
-                area
-            ], style={'width': str(width) + 'px', 'display': 'inline-block',
-                      'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
-                      'marginRight': 5})
+        area = dcc.Upload(id=id, children=html.Div(
+            ['Drag and Drop or ', html.A('Select Files')]))
 
-        else:
-            area = dcc.Upload(id=id, children=html.Div(
-                ['Drag and Drop or ', html.A('Select Files')]))
-
-            return html.Div([
-                area, " "
-            ], style={'width': str(width) + 'px', 'display': 'inline-block',
-                      'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
-                      'marginRight': 5})
+        return html.Div(
+            [area, " "],
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            },
+        )
 
     def plot(self, caption=None, id=None, prefix_id='', figure=None,
              element_add=None, downloadplot_caption=None,
@@ -278,7 +324,7 @@ class SketchComponents(object):
         if height is None: height = self._plot_height
 
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
+            prefix_id = f'{prefix_id}-'
 
         html_tags = []
 
@@ -291,9 +337,8 @@ class SketchComponents(object):
         if isinstance(id, str):
             id = [id]
 
-        if figure is not None:
-            if not (isinstance(figure, list)):
-                figure = [figure]
+        if figure is not None and not (isinstance(figure, list)):
+            figure = [figure]
 
         # config={'editable': True, 'modeBarButtonsToRemove': ['sendDataToCloud']
 
@@ -303,35 +348,50 @@ class SketchComponents(object):
                 if fig_ is None:
                     fig_ = {}
 
-                html_tags.append(html.Div([
-                    dcc.Graph(id=prefix_id + id_,
-                              figure=fig_,
-                              style={'width': str(width) + 'px',
-                                     'height': str(height) + 'px'})
-                    # , config={'modeBarButtonsToRemove': ['sendDataToCloud']})
-                ]))
+                html_tags.append(
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                id=prefix_id + id_,
+                                figure=fig_,
+                                style={
+                                    'width': f'{str(width)}px',
+                                    'height': f'{str(height)}px',
+                                },
+                            )
+                        ]
+                    )
+                )
         else:
-            for id_ in id:
-                html_tags.append(html.Div([
-                    dcc.Graph(figure={}, id=prefix_id + id_,
-                              style={'width': str(width) + 'px',
-                                     'height': str(height) + 'px'})
-                    # , config={'modeBarButtonsToRemove': ['sendDataToCloud']})
-                ]))
-
-        html_style = {'width': str(width) + 'px',
-                      'height': str((height * len(id)) + 100) + 'px',
-                      'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
-                      'marginRight': 5}
+            html_tags.extend(
+                html.Div(
+                    [
+                        dcc.Graph(
+                            figure={},
+                            id=prefix_id + id_,
+                            style={
+                                'width': f'{str(width)}px',
+                                'height': f'{str(height)}px',
+                            },
+                        )
+                    ]
+                )
+                for id_ in id
+            )
+        html_style = {
+            'width': f'{str(width)}px',
+            'height': f'{str(height * len(id) + 100)}px',
+            'marginBottom': 0,
+            'marginTop': 0,
+            'marginLeft': 5,
+            'marginRight': 5,
+        }
 
         html_tags = self.download_file_link(html_tags, prefix_id,
                                             downloadplot_caption,
                                             downloadplot_tag, download_file)
 
-        if wrap_in_div:
-            return html.Div(html_tags, style=html_style)
-
-        return html_tags
+        return html.Div(html_tags, style=html_style) if wrap_in_div else html_tags
 
     def download_file_link(self, html_tags, prefix_id,
                            downloadplot_caption_list, downloadplot_tag_list,
@@ -366,7 +426,7 @@ class SketchComponents(object):
             html_tags = []
 
         if downloadplot_caption_list != None and \
-                downloadplot_tag_list != None and download_file_list != None:
+                    downloadplot_tag_list != None and download_file_list != None:
 
             if not (isinstance(downloadplot_caption_list, list)):
                 downloadplot_caption_list = [downloadplot_caption_list]
@@ -377,19 +437,27 @@ class SketchComponents(object):
             if not (isinstance(download_file_list, list)):
                 download_file_list = [download_file_list]
 
-            for i in range(0, len(download_file_list)):
-                html_download = html.Div([
-                    html.A(
-                        downloadplot_caption_list[i],
-                        id=prefix_id + downloadplot_tag_list[i],
-                        download=download_file_list[i],
-                        href="",
-                        target="_blank"
-                    ),
-                ], style={'width': str(width) + 'px',
-                          'display': 'inline-block', 'marginBottom': 0,
-                          'marginTop': 0, 'marginLeft': 5,
-                          'marginRight': 5, 'className': 'row'})
+            for i in range(len(download_file_list)):
+                html_download = html.Div(
+                    [
+                        html.A(
+                            downloadplot_caption_list[i],
+                            id=prefix_id + downloadplot_tag_list[i],
+                            download=download_file_list[i],
+                            href="",
+                            target="_blank",
+                        ),
+                    ],
+                    style={
+                        'width': f'{str(width)}px',
+                        'display': 'inline-block',
+                        'marginBottom': 0,
+                        'marginTop': 0,
+                        'marginLeft': 5,
+                        'marginRight': 5,
+                        'className': 'row',
+                    },
+                )
 
                 html_tags.append(html_download)
 
@@ -434,11 +502,9 @@ class SketchComponents(object):
         if width is None: width = self._table_width
 
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
+            prefix_id = f'{prefix_id}-'
 
-        html_tags = []
-        html_tags.append(html.H4(caption))
-
+        html_tags = [html.H4(caption)]
         if element_add is not None:
             html_tags.append(element_add)
 
@@ -452,15 +518,11 @@ class SketchComponents(object):
         except:
             pass
 
-        for i in range(0, len(id)):
+        for i in range(len(id)):
 
             id_ = id[i]
 
-            if i == len(id) - 1:
-                line_break = None
-            else:
-                line_break = html.Br()
-
+            line_break = None if i == len(id) - 1 else html.Br()
             if columns is None:
 
                 if is_dash_table:
@@ -515,9 +577,14 @@ class SketchComponents(object):
                                             downloadplot_caption,
                                             downloadplot_tag, download_file)
 
-        html_style = {'width': str(width) + 'px', 'display': 'inline-block',
-                      'marginBottom': 5, 'marginTop': 5, 'marginLeft': 5,
-                      'marginRight': 5}
+        html_style = {
+            'width': f'{str(width)}px',
+            'display': 'inline-block',
+            'marginBottom': 5,
+            'marginTop': 5,
+            'marginLeft': 5,
+            'marginRight': 5,
+        }
 
         return html.Div(html_tags, style=html_style)
 
@@ -586,7 +653,7 @@ class SketchComponents(object):
 
         if id is not None:
             if prefix_id != '':
-                id = prefix_id + '-' + id
+                id = f'{prefix_id}-{id}'
 
             return html.Div(id=id)
 
@@ -616,24 +683,36 @@ class SketchComponents(object):
 
         if id is not None:
             if prefix_id != '':
-                id = prefix_id + '-' + id
+                id = f'{prefix_id}-{id}'
 
             return html.Div(
                 id=id,
-                style={'width': str(width) + 'px', 'display': 'inline-block',
-                       'marginBottom': 5, 'marginTop': 5,
-                       'marginLeft': margin_left,
-                       'marginRight': 0, 'className': 'row'})
+                style={
+                    'width': f'{str(width)}px',
+                    'display': 'inline-block',
+                    'marginBottom': 5,
+                    'marginTop': 5,
+                    'marginLeft': margin_left,
+                    'marginRight': 0,
+                    'className': 'row',
+                },
+            )
 
         if not (isinstance(html_obj, list)):
             html_obj = [html_obj]
 
         return html.Div(
             html_obj,
-            style={'width': str(width) + 'px', 'display': 'inline-block',
-                   'marginBottom': 5, 'marginTop': 5,
-                   'marginLeft': margin_left,
-                   'marginRight': 0, 'className': 'row'})
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 5,
+                'marginTop': 5,
+                'marginLeft': margin_left,
+                'marginRight': 0,
+                'className': 'row',
+            },
+        )
 
     def extra_width_row_cell(self, html_obj, id=None, prefix_id='',
                              width=None):
@@ -643,23 +722,34 @@ class SketchComponents(object):
         # Creates drop down style HTML controls
         if id is not None:
             if prefix_id != '':
-                id = prefix_id + '-' + id
+                id = f'{prefix_id}-{id}'
 
-            return html.Div(id=id,
-                            style={'width': str(width) + 'px',
-                                   'display': 'inline-block',
-                                   'marginBottom': 5,
-                                   'marginTop': 5, 'marginLeft': 20,
-                                   'marginRight': 20})
+            return html.Div(
+                id=id,
+                style={
+                    'width': f'{str(width)}px',
+                    'display': 'inline-block',
+                    'marginBottom': 5,
+                    'marginTop': 5,
+                    'marginLeft': 20,
+                    'marginRight': 20,
+                },
+            )
 
         if not (isinstance(html_obj, list)):
             html_obj = [html_obj]
 
-        return html.Div(html_obj,
-                        style={'width': str(width) + 'px',
-                               'display': 'inline-block', 'marginBottom': 5,
-                               'marginTop': 5, 'marginLeft': 20,
-                               'marginRight': 20})
+        return html.Div(
+            html_obj,
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 5,
+                'marginTop': 5,
+                'marginLeft': 20,
+                'marginRight': 20,
+            },
+        )
 
     def link_bar(self, labels_links_dict, add=None, width=None):
         """Creates an link bar of Dash components, typically used as a menu on the top of a Dash based web page.
@@ -681,11 +771,7 @@ class SketchComponents(object):
         # Creates a link bar
         key_list = self.dict_key_list(labels_links_dict.keys())
 
-        if self._url_prefix == '':
-            url_prefix = '/'
-        else:
-            url_prefix = '/' + self._url_prefix + '/'
-
+        url_prefix = '/' if self._url_prefix == '' else f'/{self._url_prefix}/'
         if len(labels_links_dict) == 1:
             list = [dcc.Link(key_list[0], href=url_prefix)]
 
@@ -699,11 +785,15 @@ class SketchComponents(object):
             list = [dcc.Link(key_list[0], href=url_prefix), ' / ', ]
 
             for i in range(1, len(labels_links_dict) - 1):
-                list.append(dcc.Link(key_list[i],
-                                     href=url_prefix + labels_links_dict[
-                                         key_list[i]]))
-                list.append(' / ')
-
+                list.extend(
+                    (
+                        dcc.Link(
+                            key_list[i],
+                            href=url_prefix + labels_links_dict[key_list[i]],
+                        ),
+                        ' / ',
+                    )
+                )
             list.append(list.append(
                 dcc.Link(key_list[-1],
                          href=url_prefix + labels_links_dict[key_list[-1]])))
@@ -711,12 +801,18 @@ class SketchComponents(object):
         if add is not None:
             list.append(add)
 
-        return html.Div(list,
-                        style={'width': str(width) + 'px',
-                               'display': 'inline-block', 'marginBottom': 5,
-                               'marginTop': 5,
-                               'marginLeft': 5,
-                               'marginRight': 5, 'className': 'row'})
+        return html.Div(
+            list,
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 5,
+                'marginTop': 5,
+                'marginLeft': 5,
+                'marginRight': 5,
+                'className': 'row',
+            },
+        )
 
     def drop_down(self, caption=None, id=None, prefix_id='',
                   drop_down_values=None, multiselect=False, width=None,
@@ -755,9 +851,7 @@ class SketchComponents(object):
 
         # Creates drop down style HTML controls
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
-
-        drop_list = []
+            prefix_id = f'{prefix_id}-'
 
         # For each ID assign the drop down values
         if isinstance(id, str):
@@ -766,14 +860,8 @@ class SketchComponents(object):
         elif isinstance(id, list):
             id_list = id
 
-            id = {}
-
-            for i in id_list:
-                id[i] = drop_down_values
-
-        if caption is not None:
-            drop_list = [html.P(caption)]
-
+            id = {i: drop_down_values for i in id_list}
+        drop_list = [html.P(caption)] if caption is not None else []
         # for each ID create a drop down object
         for key in self.dict_key_list(id.keys()):
 
@@ -792,12 +880,17 @@ class SketchComponents(object):
             ))
 
         # wrap it into an HTML Div style table
-        return html.Div(drop_list,
-                        style={'width': str(width) + 'px',
-                               'display': 'inline-block', 'marginBottom': 0,
-                               'marginTop': 0,
-                               'marginLeft': 5,
-                               'marginRight': 5})
+        return html.Div(
+            drop_list,
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            },
+        )
 
     def timeline_dropdown(self, prefix, available_plot_lines, width=None):
         """Create a dropdown for timelines (with multiple selectable values)
@@ -814,13 +907,18 @@ class SketchComponents(object):
         """
         if width is None: width = self._drop_down_width
 
-        return html.Div([
-            self.drop_down(caption=None, id=prefix + '-lines-val',
-                           drop_down_values=available_plot_lines,
-                           multiselect=True,
-                           multiselect_start_values=available_plot_lines,
-                           width=width)
-        ])
+        return html.Div(
+            [
+                self.drop_down(
+                    caption=None,
+                    id=f'{prefix}-lines-val',
+                    drop_down_values=available_plot_lines,
+                    multiselect=True,
+                    multiselect_start_values=available_plot_lines,
+                    width=width,
+                )
+            ]
+        )
 
     def inputbox(self, caption=None, id=None, prefix_id='', width=None,
                  start_values=None):
@@ -848,9 +946,7 @@ class SketchComponents(object):
 
         # creates drop down style HTML controls
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
-
-        text_list = []
+            prefix_id = f'{prefix_id}-'
 
         # For each ID assign the drop down values
         if isinstance(id, str):
@@ -868,28 +964,28 @@ class SketchComponents(object):
                 for i in id_list:
                     id[i] = start_values
 
-        if caption is not None:
-            text_list = [html.P(caption)]
-
+        text_list = [html.P(caption)] if caption is not None else []
         # for each ID create a text object
-        for key in self.dict_key_list(id.keys()):
-            # if start_values is not None:
-            #    start_values = multiselect_start_values
-
-            # each drop down as the same drop down values
-            text_list.append(dcc.Input(
+        text_list.extend(
+            dcc.Input(
                 id=prefix_id + key,
                 value=id[key],
-                style={'width': str(width) + 'px'}
-            ))
-
+                style={'width': f'{str(width)}px'},
+            )
+            for key in self.dict_key_list(id.keys())
+        )
         # wrap it into an HTML Div style table
-        return html.Div(text_list,
-                        style={'width': str(width) + 'px',
-                               'display': 'inline-block', 'marginBottom': 0,
-                               'marginTop': 0,
-                               'marginLeft': 5,
-                               'marginRight': 5})
+        return html.Div(
+            text_list,
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            },
+        )
 
     def date_picker(self, caption=None, id=None, prefix_id='',
                     initial_date=datetime.date.today(), offset=None,
@@ -902,9 +998,9 @@ class SketchComponents(object):
         date_picker_list = [html.P(caption)]
 
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
+            prefix_id = f'{prefix_id}-'
 
-        for i in range(0, len(id)):
+        for i in range(len(id)):
 
             id_ = id[i]
 
@@ -931,12 +1027,17 @@ class SketchComponents(object):
             # if i < len(id) - 1:
             #    date_picker_list.append(' to ')
 
-        return html.Div(date_picker_list,
-                        style={'width': str(width) + 'px',
-                               'display': 'inline-block', 'marginBottom': 0,
-                               'marginTop': 0,
-                               'marginLeft': 5,
-                               'marginRight': 5})
+        return html.Div(
+            date_picker_list,
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            },
+        )
 
     #
     # style = {'width': str(width) + 'px', 'display': 'inline-block', 'marginBottom': 0, 'marginTop': 0,
@@ -948,11 +1049,9 @@ class SketchComponents(object):
                           offset=[-7, -1]):
         if width is None: width = self._drop_down_width
 
-        date_picker_list = []
-        date_picker_list.append(caption + '      ')
-
+        date_picker_list = [f'{caption}      ']
         if prefix_id != '':
-            prefix_id = prefix_id + '-'
+            prefix_id = f'{prefix_id}-'
 
         date_picker_list.append(dcc.DatePickerRange(
             id=prefix_id + id,
@@ -964,21 +1063,25 @@ class SketchComponents(object):
             display_format='DD/MM/YY'
         ))
 
-        return html.Div(date_picker_list,
-                        style={'width': str(width) + 'px',
-                               'display': 'inline-block', 'marginBottom': 0,
-                               'marginTop': 0,
-                               'marginLeft': 5,
-                               'marginRight': 5})
+        return html.Div(
+            date_picker_list,
+            style={
+                'width': f'{str(width)}px',
+                'display': 'inline-block',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            },
+        )
 
     def paragraph(self, text, id=None, prefix_id=''):
         if id is None:
             return html.P(text)
-        else:
-            if prefix_id != '':
-                id = prefix_id + '-' + id
+        if prefix_id != '':
+            id = f'{prefix_id}-{id}'
 
-            return html.P(text, id=id)
+        return html.P(text, id=id)
 
     def markdown(self, text, id=None, prefix_id='', height=None, width=None,
                  wrap_in_div=True):
@@ -988,35 +1091,32 @@ class SketchComponents(object):
             html_tags = dcc.Markdown(text)
         else:
             if prefix_id != '':
-                id = prefix_id + '-' + id
+                id = f'{prefix_id}-{id}'
 
             html_tags = dcc.Markdown(text, id=id)
 
         if height is None:
-            html_style = {'width': str(width) + 'px', 'marginBottom': 0,
-                          'marginTop': 0, 'marginLeft': 5,
-                          'marginRight': 5}
+            html_style = {
+                'width': f'{str(width)}px',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            }
         else:
-            html_style = {'width': str(width) + 'px',
-                          'height': str((height * len(id)) + 100) + 'px',
-                          'marginBottom': 0, 'marginTop': 0, 'marginLeft': 5,
-                          'marginRight': 5}
+            html_style = {
+                'width': f'{str(width)}px',
+                'height': f'{str(height * len(id) + 100)}px',
+                'marginBottom': 0,
+                'marginTop': 0,
+                'marginLeft': 5,
+                'marginRight': 5,
+            }
 
-        if wrap_in_div:
-            return html.Div(html_tags, style=html_style)
-
-        return html_tags
+        return html.Div(html_tags, style=html_style) if wrap_in_div else html_tags
 
     def dict_key_list(self, keys):
 
         # keys = di.keys()
 
-        if isinstance(keys, list):
-            return keys
-
-        lst = []
-
-        for k in keys:
-            lst.append(k)
-
-        return lst
+        return keys if isinstance(keys, list) else list(keys)

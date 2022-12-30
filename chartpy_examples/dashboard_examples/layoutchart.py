@@ -67,9 +67,7 @@ class LayoutChart(LayoutCanvas):
 
             return spot_fig, vol_fig, msg
         except Exception as e:
-            print(str(e))
-            pass
-
+            print(e)
         return {}, "Failed to download"
 
     def page_name(self):

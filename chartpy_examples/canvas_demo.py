@@ -35,7 +35,7 @@ except:
 
 run_example = 0
 
-if run_example == 1 or run_example == 0:
+if run_example in {1, 0}:
 
     df = Quandl.get(["FRED/A191RL1Q225SBEA"], authtoken=quandl_api_key)
     df.columns = ["Real QoQ"]

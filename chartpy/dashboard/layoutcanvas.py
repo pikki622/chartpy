@@ -54,9 +54,9 @@ class LayoutCanvas(ABC):
 
         boolean_val = boolean_val.lower()
 
-        if boolean_val == 'true' or boolean_val == 'yes':
+        if boolean_val in ['true', 'yes']:
             return True
-        elif boolean_val == 'false' or boolean_val == 'no':
+        elif boolean_val in ['false', 'no']:
             return False
 
     def convert_date(self, date_val, date=True):
@@ -95,9 +95,8 @@ class LayoutCanvas(ABC):
 
     def convert_int(self, int_val, listify=False):
 
-        if listify:
-            if not(isinstance(int_val, list)):
-                int_val = [int_val]
+        if listify and not (isinstance(int_val, list)):
+            int_val = [int_val]
 
         if isinstance(int_val, int):
             return int_val
@@ -117,9 +116,8 @@ class LayoutCanvas(ABC):
         if str_val is None:
             return None
 
-        if listify:
-            if not(isinstance(str_val, list)):
-                str_val = [str_val]
+        if listify and not (isinstance(str_val, list)):
+            str_val = [str_val]
 
         if isinstance(str_val, list):
             return str_val

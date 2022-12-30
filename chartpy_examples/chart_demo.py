@@ -38,7 +38,7 @@ except:
 # run_example = 3 - correlations of a few different stocks in USA
 run_example = 0
 
-if run_example == 1 or run_example == 0:
+if run_example in {1, 0}:
     df = Quandl.get("FRED/GDP", authtoken=quandl_api_key)
 
     # we can use the charting tools in several ways
@@ -56,7 +56,7 @@ if run_example == 1 or run_example == 0:
     chart.plot(engine='plotly')
     chart.plot(engine='matplotlib')
 
-if run_example == 2 or run_example == 0:
+if run_example in {2, 0}:
     # download US and Texas unemployment rate
     df = Quandl.get(["FRED/UNRATE", "FRED/TXUR"], authtoken=quandl_api_key, trim_start="2015-12-01")
 
@@ -79,7 +79,7 @@ if run_example == 2 or run_example == 0:
     Chart(df, engine='plotly', style=style).plot()
     Chart(df, engine='matplotlib', style=style).plot()
 
-if run_example == 3 or run_example == 0:
+if run_example in {3, 0}:
     df = Quandl.get(["WIKI/ABBV", "WIKI/TRIP", "WIKI/HPQ"], authtoken=quandl_api_key, trim_start="2016-06-01")
 
     # get only adjusted close field, calculate returns and create correlation matrix

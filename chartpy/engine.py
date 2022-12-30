@@ -53,30 +53,31 @@ class EngineTemplate(ABC):
         xd = data_frame.index
         no_of_bars = len(data_frame.columns)
 
-        if style.chart_type is not None:
-            if isinstance(style.chart_type, list):
-                if 'bar' in style.chart_type:
-                    xd = bar_ind
-                    no_of_bars = style.chart_type.count('bar')
-                    has_bar = 'barv'
-                elif 'stacked' in style.chart_type:
-                    xd = bar_ind
-                    no_of_bars = 1
-                    has_bar = 'barv'
-            elif 'bar' == style.chart_type:
-                xd = bar_ind
-                has_bar = 'barv'
-            elif 'barh' == style.chart_type:
-                xd = bar_ind
-                has_bar = 'barh'
-            elif 'stacked' == style.chart_type:
-                xd = bar_ind
-                has_bar = 'barh'
-        else:
-            if chart_type == 'bar' or chart_type == 'stacked':
+        if style.chart_type is None:
+            if chart_type in ['bar', 'stacked']:
                 xd = bar_ind
                 has_bar = 'barv'
 
+        elif isinstance(style.chart_type, list) and 'bar' in style.chart_type:
+            xd = bar_ind
+            no_of_bars = style.chart_type.count('bar')
+            has_bar = 'barv'
+        elif isinstance(style.chart_type, list) and 'stacked' in style.chart_type:
+            xd = bar_ind
+            no_of_bars = 1
+            has_bar = 'barv'
+        elif isinstance(style.chart_type, list) or style.chart_type not in [
+            'bar',
+            'barh',
+            'stacked',
+        ]:
+            pass
+        elif style.chart_type == 'bar':
+            xd = bar_ind
+            has_bar = 'barv'
+        else:
+            xd = bar_ind
+            has_bar = 'barh'
         return xd, bar_ind, has_bar, no_of_bars
 
     def assign(self, structure, field, default):
@@ -92,10 +93,7 @@ class EngineTemplate(ABC):
 
     def get_linewidth(self, label, linewidth_1, linewidth_2,
                       linewidth_2_series):
-        if label in linewidth_2_series:
-            return linewidth_2
-
-        return linewidth_1
+        return linewidth_2 if label in linewidth_2_series else linewidth_1
 
     def round_to_1(self, x):
         return round(x, -int(floor(log10(x))))
@@ -105,33 +103,26 @@ class EngineTemplate(ABC):
 
         if isinstance(data_frame, list):
             data_frame_list = data_frame
-        else:
-            if style.subplots == True and isinstance(data_frame,
+        elif style.subplots == True and isinstance(data_frame,
                                                      pandas.DataFrame):
 
-                for col in data_frame.columns:
-                    data_frame_list.append(
-                        pandas.DataFrame(index=data_frame.index, columns=[col],
-                                         data=data_frame[col]))
-            else:
-                data_frame_list.append(data_frame)
+            for col in data_frame.columns:
+                data_frame_list.append(
+                    pandas.DataFrame(index=data_frame.index, columns=[col],
+                                     data=data_frame[col]))
+        else:
+            data_frame_list.append(data_frame)
 
         return data_frame_list
 
     def generate_file_names(self, style, engine):
-        if style.html_file_output is not None and not (
-        style.auto_generate_html_filename):
-            pass
-        else:
+        if style.html_file_output is None or style.auto_generate_html_filename:
             import time
             style.html_file_output = (
                         self.get_time_stamp() + "-" + engine + ".html")
             style.auto_generate_html_filename = True
 
-        if style.file_output is not None and not (
-        style.auto_generate_filename):
-            pass
-        else:
+        if style.file_output is None or style.auto_generate_filename:
             import time
             style.file_output = (self.get_time_stamp() + "-" + engine + ".png")
             style.auto_generate_filename = True

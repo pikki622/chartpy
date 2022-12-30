@@ -42,11 +42,11 @@ class Style(object):
                  # Type of plot (can be defined as list)
                  engine=None,
                  chart_type=None,
-                 
+
                  # Type of bar chart
                  barmode=None,
                  stackgroup=None,
-                 
+
                  # Drop NaN points before plotting
                  drop_na=False,
 
@@ -67,7 +67,7 @@ class Style(object):
                  candlestick_increasing_line_color=None,
                  candlestick_decreasing_color=None,
                  candlestick_decreasing_line_color=None,
-                 
+
                  # Overlay figures
                  overlay_fig=None,
 
@@ -195,11 +195,11 @@ class Style(object):
 
         # Chart type
         self.chart_type = chart_type
-        
+
         # Type of bar mode
         self.barmode = barmode
         self.stackgroup = stackgroup
-        
+
         # Drop NaN before plotting
         self.drop_na = drop_na
 
@@ -220,10 +220,10 @@ class Style(object):
         self.candlestick_increasing_line_color = candlestick_increasing_line_color
         self.candlestick_decreasing_color = candlestick_decreasing_color
         self.candlestick_decreasing_line_color = candlestick_decreasing_line_color
-        
+
         # Overlay plots
         self.overlay_fig = overlay_fig
-        
+
         # Subplots
         self.subplots = subplots
         self.subplot_titles = subplot_titles
@@ -239,7 +239,7 @@ class Style(object):
 
         # Block display
         self.block_new_plots = block_new_plots
-        
+
         # Animation parameters
         self.animate_figure = animate_figure
         self.animate_titles = animate_titles
@@ -273,7 +273,7 @@ class Style(object):
         # x and y axis type (eg. category)
         self.x_axis_type = x_axis_type
         self.y_axis_type = y_axis_type
-        
+
         # Gaps between tick labels
         self.x_dtick = x_dtick
         self.y_dtick = y_dtick
@@ -317,11 +317,7 @@ class Style(object):
 
         # plotly only
         if plotly_url is None:
-            if isinstance(title, list):
-                plotly_url = str(title[0])
-            else:
-                plotly_url = title
-
+            plotly_url = str(title[0]) if isinstance(title, list) else title
             plotly_url = plotly_url +  datetime.datetime.utcnow().strftime("%b-%d-%Y-%H-%M-%S")
 
         self.plotly_url = plotly_url

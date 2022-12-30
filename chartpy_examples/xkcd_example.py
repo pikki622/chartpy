@@ -35,7 +35,7 @@ except:
 # run_example = 2 - fun xkcd example
 run_example = 0
 
-if run_example == 1 or run_example == 0:
+if run_example in {1, 0}:
     df = Quandl.get(["FRED/A191RL1Q225SBEA"], authtoken=quandl_api_key)
     df.columns = ["Real QoQ"]
 
@@ -47,7 +47,7 @@ if run_example == 1 or run_example == 0:
 
     chart.plot()
 
-if run_example == 2 or run_example == 0:
+if run_example in {2, 0}:
     import pandas, numpy
 
     dt = pandas.date_range(start="1 Jan 1950", end="1 Apr 2017", freq='M')

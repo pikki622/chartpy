@@ -51,7 +51,13 @@ class CallbackManager(object):
         if not (isinstance(input, list)):
             input = [input]
 
-        return [Input(page + '-' + i.split(':')[0], self._find_type(i, input_output_state='input')) for i in input]
+        return [
+            Input(
+                f'{page}-' + i.split(':')[0],
+                self._find_type(i, input_output_state='input'),
+            )
+            for i in input
+        ]
 
     def output_callback(self, page, output):
         """Create a output callback for a Dash component, which can be used to trigger callbacks. Note, that we can have multiple callbacks.
@@ -69,10 +75,20 @@ class CallbackManager(object):
         dash.dependencies.Output (list)
         """
 
-        if not (isinstance(output, list)):
-            return Output(page + '-' + output.split(':')[0], self._find_type(output, input_output_state='output'))
-
-        return [Output(page + '-' + out.split(':')[0], self._find_type(out, input_output_state='output')) for out in output]
+        return (
+            [
+                Output(
+                    f'{page}-' + out.split(':')[0],
+                    self._find_type(out, input_output_state='output'),
+                )
+                for out in output
+            ]
+            if (isinstance(output, list))
+            else Output(
+                f'{page}-' + output.split(':')[0],
+                self._find_type(output, input_output_state='output'),
+            )
+        )
 
         # return Output(page + '-' + output.split(':')[0], self._find_type(output))
 
@@ -95,7 +111,13 @@ class CallbackManager(object):
         if not (isinstance(state, list)):
             state = [state]
 
-        return [State(page + '-' + s.split(':')[0], self._find_type(s, input_output_state='state')) for s in state]
+        return [
+            State(
+                f'{page}-' + s.split(':')[0],
+                self._find_type(s, input_output_state='state'),
+            )
+            for s in state
+        ]
 
     def _find_type(self, tag, input_output_state='input'):
         """Returns the dash type for a dash component.
@@ -123,11 +145,7 @@ class CallbackManager(object):
 
         # table like objects
         if 'table' in tag:
-            if self._constants.gui_table_type == 'dash':
-                return 'data'
-
-            return 'children'
-
+            return 'data' if self._constants.gui_table_type == 'dash' else 'children'
         # labels
         if 'status' in tag:
             return 'children'
@@ -146,9 +164,6 @@ class CallbackManager(object):
 
         # drop down values
         if 'val' in tag or 'dropdown' in tag:
-            if input_output_state == 'output':
-                return 'value'
-
             return 'value'
 
         # HTML ordinary buttons
@@ -191,11 +206,7 @@ class SessionManager(object):
 
             username = self.get_username()
 
-            if username is not None:
-                username = '_' + username
-            else:
-                username = ''
-
+            username = f'_{username}' if username is not None else ''
             session['id'] = id + username
         else:
             id = session['id']
@@ -259,11 +270,7 @@ class SessionManager(object):
         """
         if tag in session:
 
-            if isinstance(session[tag], bool):
-                return session[tag]
-
-            return str(session[tag])
-
+            return session[tag] if isinstance(session[tag], bool) else str(session[tag])
         return None
 
     ##### these methods are for keeping track of which lines, user zooms have been plotted for each chart in the user's
@@ -308,11 +315,7 @@ class SessionManager(object):
 
         """
 
-        if tag in session:
-            if relayoutData == session[tag]:
-                return True
-
-        return False
+        return tag in session and relayoutData == session[tag]
 
     def set_lines_plotted(self, lines_to_plot, tag):
         """Sets the lines plotted for a particular chart _tag in the user's session
@@ -366,10 +369,7 @@ class SessionManager(object):
         Number of clicks by current user
         """
 
-        if tag not in session:
-            return 0
-
-        return session[tag]
+        return 0 if tag not in session else session[tag]
 
     def set_session_clicks(self, tag, n_clicks, old_clicks=None):
         """Sets the number of clicks in the current user's session
@@ -385,9 +385,7 @@ class SessionManager(object):
 
         """
 
-        if old_clicks is None:
-            session[tag] = n_clicks
-        elif old_clicks > n_clicks:
+        if old_clicks is None or old_clicks > n_clicks:
             session[tag] = n_clicks
 
     def check_session_tag(self, tag):
@@ -402,10 +400,7 @@ class SessionManager(object):
         -------
         str or bool
         """
-        if tag in session:
-            return session[tag]
-
-        return False
+        return session[tag] if tag in session else False
 
     def exists_session_tag(self, tag):
         """Does a _tag exist in the current user session?
@@ -434,9 +429,7 @@ class SessionManager(object):
         bool
         """
         if tag in session:
-            old_tag = session[tag]
-
-            if old_tag:
+            if old_tag := session[tag]:
                 session[tag] = False
 
                 return True
@@ -466,10 +459,10 @@ class SessionManager(object):
 
         if isinstance(prefix, list):
             prefix = self.flatten_list_of_lists(prefix)
-            lst = [x + '-' + lst for x in prefix]
+            lst = [f'{x}-{lst}' for x in prefix]
         elif isinstance(lst, list):
             lst = self.flatten_list_of_lists(lst)
-            lst = [prefix + '-' + x for x in lst]
+            lst = [f'{prefix}-{x}' for x in lst]
 
         if lst2 is None:
             return lst
@@ -477,9 +470,7 @@ class SessionManager(object):
         lst3 = []
 
         for i in lst2:
-            for j in lst:
-                lst3.append(j + '-' + i)
-
+            lst3.extend(f'{j}-{i}' for j in lst)
         return lst3
 
     def flatten_list_of_lists(self, list_of_lists):

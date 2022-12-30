@@ -79,10 +79,8 @@ class CanvasPlotterTemplate(ABC):
         html = soup.prettify()
 
         if not(return_html_binary):
-            html_file = open(html_filename, "w")
-            html_file.write(html)
-            html_file.close()
-
+            with open(html_filename, "w") as html_file:
+                html_file.write(html)
             if (not (silent_display)):
                 import webbrowser
                 webbrowser.open(html_filename)
@@ -136,92 +134,89 @@ class CanvasPlotterPlain(CanvasPlotterTemplate):
                       page_title="chartpy dashboard", render_pdf=False, return_html_binary=False, return_pdf_binary=False,
                       extra_head_code=''):
 
-        html = []
-        html.append('<head><title>' + page_title + '</title>')
-        html.append(plain_css)
-        html.append(extra_head_code)
-        html.append('</head>')
-
-        html.append('<h1>' + page_title + '</h1>')
-        html.append('<table cellpadding="0">')
-
+        html = [
+            '<head><title>' + page_title + '</title>',
+            plain_css,
+            extra_head_code,
+            '</head>',
+            '<h1>' + page_title + '</h1>',
+            '<table cellpadding="0">',
+        ]
         if not (isinstance(elements_to_render, list)):
             elements_to_render = [elements_to_render]
 
-        for i in range(0, len(elements_to_render)):
+        for i in range(len(elements_to_render)):
 
             row = elements_to_render[i]
 
             if not (isinstance(row, list)):
                 row = [row]
 
-            if row != []:
-                if row is not None:
+            if row != [] and row is not None:
+                html.append('<tr>\n')
 
-                    html.append('<tr>\n')
+                for j in range(len(row)):
+                    html.append('<td>')
 
-                    for j in range(0, len(row)):
-                        html.append('<td>')
+                    object = row[j]
 
-                        object = row[j]
+                    if isinstance(object, Chart):
 
-                        if isinstance(object, Chart):
+                        chart = object
 
-                            chart = object
+                        padding = 40
 
-                            padding = 40
+                        old_margin = chart.style.thin_margin
+                        old_silent_display = chart.style.silent_display
+                        chart.style.silent_display = True
+                        chart.style.thin_margin = True
 
-                            old_margin = chart.style.thin_margin
-                            old_silent_display = chart.style.silent_display
-                            chart.style.silent_display = True
-                            chart.style.thin_margin = True
+                        chart.plot()
 
-                            chart.plot()
+                        chart.style.thin_margin = old_margin
+                        chart.style.silent_display = old_silent_display
 
-                            chart.style.thin_margin = old_margin
-                            chart.style.silent_display = old_silent_display
+                        # grab file name
+                        if chart.engine == 'matplotlib':
+                            # if (chart.style.file_output is None):
+                            #     import time
+                            #     chart.style.file_output = str(time.time()) + "matplotlib.png"
 
-                            # grab file name
-                            if chart.engine == 'matplotlib':
-                                # if (chart.style.file_output is None):
-                                #     import time
-                                #     chart.style.file_output = str(time.time()) + "matplotlib.png"
+                            source_file = chart.style.file_output
+                        else:
+                            source_file = chart.style.html_file_output
 
-                                source_file = chart.style.file_output
-                            else:
-                                source_file = chart.style.html_file_output
+                        try:
+                            width = chart.style.width * abs(chart.style.scale_factor) + padding
+                            height = chart.style.height * abs(chart.style.scale_factor) + padding
 
-                            try:
-                                width = chart.style.width * abs(chart.style.scale_factor) + padding
-                                height = chart.style.height * abs(chart.style.scale_factor) + padding
-
-                                # html.append('<div align="center"><div>')
-                                html.append('<iframe src="' + source_file + '" width="' + str(width) + \
+                            # html.append('<div align="center"><div>')
+                            html.append('<iframe src="' + source_file + '" width="' + str(width) + \
                                             '" height="' + str(height) + '" frameborder="0" scrolling="no"></iframe>')
 
-                                # html.append('</div></div>')
-                            except:
-                                pass
+                            # html.append('</div></div>')
+                        except:
+                            pass
 
-                            # print(chart.style.html_file_output)
-                            # print(chart)
-                        elif isinstance(object, pandas.DataFrame):
-                            old_width = pandas.get_option('display.max_colwidth')
-                            pandas.set_option('display.max_colwidth', -1)
+                        # print(chart.style.html_file_output)
+                        # print(chart)
+                    elif isinstance(object, pandas.DataFrame):
+                        old_width = pandas.get_option('display.max_colwidth')
+                        pandas.set_option('display.max_colwidth', -1)
 
-                            html_table = object.to_html(escape=False).replace('border="1"', 'border="0"')
-                            html_table = html_table.replace("text-align: right;",
-                                                            "text-align: center; vertical-align: text-top;")
+                        html_table = object.to_html(escape=False).replace('border="1"', 'border="0"')
+                        html_table = html_table.replace("text-align: right;",
+                                                        "text-align: center; vertical-align: text-top;")
 
-                            html.append(html_table)
-                            pandas.set_option('display.max_colwidth', old_width)
-                        else:
-                            # assume it's a string of some sort
-                            html.append(object)
+                        html.append(html_table)
+                        pandas.set_option('display.max_colwidth', old_width)
+                    else:
+                        # assume it's a string of some sort
+                        html.append(object)
 
-                        html.append('</td>\n')
+                    html.append('</td>\n')
 
-                    html.append('</tr>\n')
+                html.append('</tr>\n')
 
         html.append('</table>\n')
 
@@ -237,22 +232,21 @@ class CanvasPlotterKeen(CanvasPlotterTemplate):
                       page_title='chartpy dashboard', render_pdf=False, return_html_binary=False, return_pdf_binary=False,
                       extra_head_code=''):
 
-        html = []
-
-        html.append('''
+        html = [
+            '''
                 <!DOCTYPE html>
                 <html>
                 <head>
-                  <title>''')
-        html.append(page_title)
-        html.append('''</title>
+                  <title>''',
+            page_title,
+            '''</title>
                   <link rel="shortcut icon" href="logo.png" />
                   <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css" />
                   <link rel="stylesheet" type="text/css" href="static/css/keen-dashboards.css" />
                   <!-- For slider -->
-                  <link rel="stylesheet" type="text/css" href="static/css/iThing.css" />''')
-        html.append(extra_head_code)
-        html.append('''</head>
+                  <link rel="stylesheet" type="text/css" href="static/css/iThing.css" />''',
+            extra_head_code,
+            '''</head>
                 <body class="application">
 
                 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -272,106 +266,113 @@ class CanvasPlotterKeen(CanvasPlotterTemplate):
                       </div>
                     </div>
                 </div>
-                ''')
-
-        html.append('<div class="container-fluid">')
+                ''',
+            '<div class="container-fluid">',
+        ]
 
         if not (isinstance(elements_to_render, list)):
             elements_to_render = [elements_to_render]
 
-        for i in range(0, len(elements_to_render)):
+        for i in range(len(elements_to_render)):
 
             row = elements_to_render[i]
 
-            if row != []:
-                if row is not None:
+            if row != [] and row is not None:
+                if not (isinstance(row, list)):
+                    row = [row]
 
-                    if not (isinstance(row, list)):
-                        row = [row]
+                html.append('<div class="row">')  # open row
 
-                    html.append('<div class="row">')  # open row
+                for j in range(len(row)):
 
-                    for j in range(0, len(row)):
+                    object = row[j]
 
-                        object = row[j]
+                    if isinstance(object, Chart):
 
-                        if isinstance(object, Chart):
+                        chart = object
+                        padding = 20
 
-                            chart = object
-                            padding = 20
+                        html.extend(
+                            (
+                                f'<div style="display:inline-block; width: {str(chart.style.width * abs(chart.style.scale_factor) + padding)}px">',
+                                '<div class="chart-wrapper">',
+                                '<div class="chart-title">'
+                                + chart.style.title
+                                + '</div>',
+                            )
+                        )
+                        old_scale_factor = chart.style.scale_factor
+                        old_silent_display = chart.style.silent_display
+                        old_margin = chart.style.thin_margin
+                        old_title = chart.style.title
+                        old_source = chart.style.source
 
-                            html.append('<div style="display:inline-block; width: ' + str(
-                                chart.style.width * abs(chart.style.scale_factor) + padding) + 'px">')
+                        chart.style.silent_display = True
+                        chart.style.title = None
+                        chart.style.source = None
+                        chart.style.thin_margin = True
 
-                            html.append('<div class="chart-wrapper">')
-                            html.append('<div class="chart-title">' + chart.style.title + '</div>')
+                        # hack to get bokeh to fit properly in window
+                        if chart.engine == 'bokeh':
+                            chart.style.scale_factor = 0.9 * chart.style.scale_factor
 
-                            old_scale_factor = chart.style.scale_factor
-                            old_silent_display = chart.style.silent_display
-                            old_margin = chart.style.thin_margin
-                            old_title = chart.style.title
-                            old_source = chart.style.source
+                        chart.plot()
 
-                            chart.style.silent_display = True
-                            chart.style.title = None
-                            chart.style.source = None
-                            chart.style.thin_margin = True
+                        chart.style.silent_display = old_silent_display
+                        chart.style.scale_factor = old_scale_factor
+                        chart.style.thin_margin = old_margin
+                        chart.style.title = old_title
+                        chart.style.source = old_source
 
-                            # hack to get bokeh to fit properly in window
-                            if chart.engine == 'bokeh':
-                                chart.style.scale_factor = 0.9 * chart.style.scale_factor
+                        if chart.engine == 'matplotlib':
+                            if (chart.style.file_output is None):
+                                import time
+                                chart.style.file_output = f"{str(time.time())}matplotlib.png"
 
-                            chart.plot()
-
-                            chart.style.silent_display = old_silent_display
-                            chart.style.scale_factor = old_scale_factor
-                            chart.style.thin_margin = old_margin
-                            chart.style.title = old_title
-                            chart.style.source = old_source
-
-                            if chart.engine == 'matplotlib':
-                                if (chart.style.file_output is None):
-                                    import time
-                                    chart.style.file_output = str(time.time()) + "matplotlib.png"
-
-                                source_file = chart.style.file_output
-                            else:
-                                source_file = chart.style.html_file_output
-
-                            try:
-                                html.append('<div style="display:inline-block; height: '
-                                            + str(chart.style.height * abs(chart.style.scale_factor) + padding)
-                                            + 'px; vertical-align: center" class="chart-stage">')
-
-                                html.append('<iframe src="' + source_file + '" width="' + str(
-                                    chart.style.width * abs(chart.style.scale_factor) + padding) + \
-                                            '" height="' + str(chart.style.height * abs(
-                                    chart.style.scale_factor) + padding) + '" frameborder="0" scrolling="no" align="middle"></iframe>')
-
-                                html.append('</div>')
-
-                                html.append('<div class="chart-notes">' + old_source + '</div>')
-
-                            except:
-                                pass
-
-                            html.append('</div>')
-
-                            # print(chart.style.html_file_output)
-                            # print(chart)
-                        elif isinstance(object, pandas.DataFrame):
-                            html.append('<div style="display:inline-block;>')
-                            html.append(object.to_html())
-                            html.append('</div>')
+                            source_file = chart.style.file_output
                         else:
-                            # assume it's a string otherwise
-                            html.append('<div style="display:inline-block;>')
-                            html.append(object)
-                            html.append('</div>')
+                            source_file = chart.style.html_file_output
 
-                        html.append('</div>')
+                        try:
+                            html.append(
+                                f'<div style="display:inline-block; height: {str(chart.style.height * abs(chart.style.scale_factor) + padding)}px; vertical-align: center" class="chart-stage">'
+                            )
 
-                    html.append('</div>')
+                            html.extend(
+                                (
+                                    '<iframe src="'
+                                    + source_file
+                                    + '" width="'
+                                    + str(
+                                        chart.style.width
+                                        * abs(chart.style.scale_factor)
+                                        + padding
+                                    )
+                                    + '" height="'
+                                    + str(
+                                        chart.style.height
+                                        * abs(chart.style.scale_factor)
+                                        + padding
+                                    )
+                                    + '" frameborder="0" scrolling="no" align="middle"></iframe>',
+                                    '</div>',
+                                    '<div class="chart-notes">'
+                                    + old_source
+                                    + '</div>',
+                                )
+                            )
+                        except:
+                            pass
+
+                                            # print(chart.style.html_file_output)
+                                            # print(chart)
+                    elif isinstance(object, pandas.DataFrame):
+                        html.append('<div style="display:inline-block;>')
+                        html.append(object.to_html())
+                    else:
+                        html.extend(('<div style="display:inline-block;>', object))
+                    html.extend(('</div>', '</div>'))
+                html.append('</div>')
 
         html.append('</div>')
 

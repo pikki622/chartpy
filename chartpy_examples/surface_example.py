@@ -18,7 +18,7 @@ from chartpy import Chart, Style
 # run_example = 1 - plot volatility surface
 run_example = 0
 
-if run_example == 1 or run_example == 0:
+if run_example in {1, 0}:
     import pandas
 
     # get sample volatility surface for GBP/USD (and make sure columns are in reasonable order)
